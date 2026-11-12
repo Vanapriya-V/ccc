@@ -1,0 +1,105 @@
+install docker
+
+	sudo apt update
+
+	sudo apt install docker.io -y
+
+2. Enable and groupadd docker
+
+	sudo systemctl enable --now docker
+
+	sudo usermod -aG docker $USER
+
+	docker version
+
+3. Pull and run first container - hello-world
+
+	sudo docker ps -a
+
+	sudo docker pull hello-world
+
+	sudo docker run hello-world
+
+	sudo docker ps -a
+
+	(it will automatically terminated)
+
+4. Find docker images
+
+	sudo docker images
+
+
+5. Pull and run ubuntu container
+
+	sudo docker pull ubuntu
+
+	sudo docker run -it --name myubuntu ubuntu bash
+	(a terminal open root@)
+
+	Execute commands:
+
+		cat /etc/os-release
+
+		pwd
+
+		echo "Hello !"
+
+	sudo docker ps -a
+
+	sudo docker stop myubuntu
+
+6. Create and run first container
+
+	create code files and docker file:
+
+		mkdir -p ~/firstcontainer
+
+		cd ~/firstcontainer
+
+		nano index.html
+
+<!DOCTYPE html>
+
+<html>
+<head>
+        <title>First Container</title>
+</head>
+
+<body>
+        <h1>Hello World !</h1>
+        <h2>This is first docker image !</h2>
+</body>
+</html>
+
+		nano Dockerfile
+
+FROM nginx:alpine
+
+COPY index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+
+
+7. Build docker image and run docker container
+
+	sudo docker build -t mywebapp .
+
+	sudo docker run -d -p 8080:80 --name webcontainer mywebapp
+
+	sudo docker logs webcontainer
+
+	open http://localhost:8080 and verify
+
+	sudo docker ps -a
+
+8. stop and start again and verify running of container then remove
+
+	sudo docker stop webcontainer
+
+	sudo docker start webcontainer
+
+	open http://localhost:8080
+
+	sudo docker stop webcontainer
+
+	sudo docker rm webcontainer

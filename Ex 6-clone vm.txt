@@ -1,0 +1,30 @@
+clone vm:
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" clonevm "Ubuntu" --name "Ubuntu-VM2" --register --mode machine
+
+Verify cloning:
+"C:\Program Files\Oracle\VirtualBox\VBoxManage.exe" list vms
+
+Commands:
+
+(In both vms):
+
+sudo groupadd vboxsf
+sudo usermod -aG vboxsf $USER
+sudo apt update && sudo apt install -y virtualbox-guest-utils
+sudo systemctl reboot -i 
+
+(Create file in VM1)
+
+cd /media
+ls   (output: result)
+cd (result)
+echo "Hello from VM 1">sample.txt
+
+(Access file in VM2):
+
+cd /media
+ls (output: result)
+cd (result)
+ls (output: sample.txt)
+cat sample.txt 
+(output: Hello from VM 1)

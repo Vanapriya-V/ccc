@@ -1,0 +1,202 @@
+PART A - INSTALL HADOOP
+
+Install ssh and java
+
+	sudo apt update
+
+	sudo apt install openjdk-11-jdk ssh -y
+
+	java --version
+
+2. SSH password less setup
+
+	a) Generate key
+
+		ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+
+	b) Move public key to Authorized keys
+
+		sudo cat ~/.ssh/id_rsa.pub>>~/.ssh/authorized_keys
+
+	c) Set permission to authorised keys
+
+		chmod 600 ~/.ssh/authorized_keys
+
+	d) Start connection
+
+		ssh localhost
+		
+		exit
+
+3. Install Hadoop
+
+	a) Download Hadoop
+
+		cd ~
+
+		wget https://archive.apache.org/dist/hadoop/core/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+
+	b) Extract Files
+
+		tar -xzf hadoop-2.7.3.tar.gz
+
+	c) Find java home
+
+		readlink -f $(which java)
+		op: javahome
+
+	d) Configure env variables in ~/.bashrc
+
+		java home:
+			echo "export JAVA_HOME=javahome">>~/.bashrc
+
+		Hadoop home:
+			echo "export HADOOP_HOME=$USER/hadoop-2.7.3">>~/.bashrc
+
+		Path:
+			echo "export PATH=$PATH:$JAVA_HOME/bin:$HADOOP_HOME/bin:$HADOOP_HOME/sbin">>~/.bashrc
+
+	hadoop version
+
+PART B - SINGLE NODE CLUSTER
+
+Configure Hadoop files
+
+	cd ~/hadoop-2.7.3/etc/Hadoop
+
+	ls
+
+	a) env.sh
+
+		export JAVA_HOME = javahome
+
+	b) core-site.xml
+
+		<configuration>
+			<property>
+				<name>df.DefaultDF</name>
+				<value>hdfs://localhost:9000</value>
+			</property>
+		</configuration>
+
+	c) hdfs-site.xml
+
+		<configuration>
+			<property>
+				<name>dfs.replication</name>
+				<value>1</value>
+			</property>
+		</configuration>
+
+	d) mapred-site.xml
+
+		cp mapred-site.xml.template mapred-site.xml
+
+		<configuration>
+			<property>
+				<name>mapred.framework.name</name>
+				<value>yarn</value>
+			</property>
+		</configuration>
+
+	e) yarn-site.xml
+
+		<configuration>
+			<property>
+				<name>yarn.nodemanager.aux-services</name>
+				<value>mapreduce_shuffle</value>
+			</property>
+			<property>
+				<name>yarn.nodemanager.aux-services.mapreduce_shuffle.class</name>
+				<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+			</property>
+		</configuration>
+
+2. Create namenode format and start services
+
+	a) namenode
+
+		dfs namenode -format
+
+	b) start dfs
+
+		start-dfs.sh
+
+	c) start yarn
+
+		start-yarn.sh
+
+	d) start historyserver
+
+		mr-jobhistory-daemon.sh start historyserver
+
+	e) verification
+
+		jps
+		output:
+			swetha@suveth2007:~/hadoop-2.7.3/etc/hadoop$ jps
+			12819 SecondaryNameNode
+			12997 ResourceManager
+			12486 NameNode
+			13527 Jps
+			12631 DataNode
+			13113 NodeManager
+			13486 JobHistoryServer
+
+PART C - WORD COUNT
+
+Create test file in ubuntu
+
+	cd ~
+
+	mkdir -p ~/wcinput
+
+	cd ~/wcinput
+
+	echo "Hello Hadoop Hello Cloud Computing Cloud Computing with Hadoop">>input.txt
+
+2. Create input folder in Hadoop
+
+	hdfs dfs -mkdir -p /user/$USER/input
+
+3. put ubuntu file into Hadoop input folder
+
+	hdfs dfs -put ~/wcinput/input.txt /user/$USER/input/
+
+4. Run file
+
+	Hadoop jar $HADOOP_HOME/share/apache/Hadoop/mapreduce/Hadoop-mapreduce-examples-2.7.3.jar wordcount /user/$USER/input /user/$USER/output
+
+5. disply result
+
+	hdfs dfs -cat /user/$USER/output/part-r-00000
+
+output:
+Cloud   2
+Computing       2
+Hadoop  2
+Hello   2
+with    1
+
+
+NOTE:
+
+change one java version to another
+
+	sudo update-alternatives --config java
+
+2. If error in connection "ssh localhost"
+
+	sudo systemctl start ssh
+	sudo systemctl enable ssh
+	sudo ssh-keygen -A
+	sudo mkdir -p /run/sshd
+	sudo sshd -t
+	sudo systemctl reset-failed ssh
+	sudo systemctl start ssh
+	sudo systemctl status ssh
+	ssh localhost
+
+3. HDFS web page
+
+	http://localhost:50070

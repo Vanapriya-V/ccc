@@ -1,0 +1,45 @@
+main.py
+
+
+from datetime import datetime
+from flask import Flask
+from markupsafe import escape
+
+app = Flask(__name__)
+
+@app.route("/")
+def hello():
+    return "Hello, World! This is my first Google App Engine app."
+
+@app.route("/hello/<name>")
+def greet(name):
+    return "<h1>Hello, " + str(escape(name)) + "!</h1>"
+
+@app.route("/time")
+def show_time():
+    return "Server time: " + datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+
+@app.route("/add/<int:a>/<int:b>")
+def add(a, b):
+    return str(a) + " + " + str(b) + " = " + str(a + b)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=8080, debug=True)
+
+
+app.yaml
+runtime: python312
+
+requirements.txt
+Flask>=3.0
+
+WSGI
+import sys
+
+path = '/home/YOUR_USERNAME/hello-gae'
+
+if path not in sys.path:
+    sys.path.append(path)
+
+from main import app as application
+

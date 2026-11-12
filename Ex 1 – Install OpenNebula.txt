@@ -1,0 +1,129 @@
+Experiment 1 – Install OpenNebula on Ubuntu 24.04
+We'll install the OpenNebula Community Edition (CE) frontend and its web interface, FireEdge.
+
+These commands are for your Ubuntu VM, not Windows PowerShell.
+
+Ubuntu 24.04
+ OpenNebula Community Edition
+
+
+Important: Your VM currently has 4 GB RAM and 40 GB disk. This is a small lab setup, not the recommended production configuration. OpenNebula's current documentation lists Ubuntu Server 24.04 as supported. 
+docs.opennebula.io+1
+
+Step 1 – Open Ubuntu Terminal
+Press:
+
+Ctrl + Alt + T
+
+First, check your Ubuntu version:
+lsb_release -a
+
+
+Update Ubuntu:
+sudo apt update
+
+
+sudo apt upgrade -y
+
+
+Install the required utilities:
+sudo apt install wget gnupg apt-transport-https ca-certificates -y
+
+
+Step 2 – Add OpenNebula repository
+Run these commands one by one:
+
+Command 1 – Create keyring directory
+sudo mkdir -p /etc/apt/keyrings
+
+
+Command 2 – Download OpenNebula signing key
+wget -q -O- https://downloads.opennebula.io/repo/repo2.key | sudo gpg --dearmor --yes --output /etc/apt/keyrings/opennebula.gpg
+
+
+Command 3 – Add OpenNebula 7.4 Community Edition repository
+echo "deb [signed-by=/etc/apt/keyrings/opennebula.gpg] https://downloads.opennebula.io/repo/7.4/Ubuntu/24.04 stable opennebula" | sudo tee /etc/apt/sources.list.d/opennebula.list
+
+
+Command 4 – Update package list
+sudo apt update
+
+
+Step 3 – Install OpenNebula
+Execute:
+sudo apt install opennebula opennebula-fireedge opennebula-gate opennebula-flow -y
+
+
+This installs the OpenNebula frontend, web interface, OneGate and OneFlow components.
+
+Wait until installation finishes. It may take some time.
+Step 4 – Start OpenNebula services
+Run:
+sudo systemctl start opennebula
+
+
+sudo systemctl start opennebula-fireedge
+
+
+sudo systemctl start opennebula-gate
+
+
+sudo systemctl start opennebula-flow
+
+
+Enable automatic startup:
+sudo systemctl enable opennebula opennebula-fireedge opennebula-gate opennebula-flow
+
+
+Step 5 – Verify installation
+Check the services:
+sudo systemctl status opennebula
+
+
+sudo systemctl status opennebula-fireedge
+
+
+Check OpenNebula:
+sudo -u oneadmin oneuser show
+
+
+You should see the oneadmin user information if the daemon is working. 
+docs.opennebula.io
+
+Step 6 – Open OpenNebula dashboard
+Open Firefox inside Ubuntu.
+
+Enter this address:
+http://localhost:2616/fireedge/sunstone
+
+
+
+
+
+
+
+
+
+
+docs.opennebula.io
+
+
+Login details:
+- Username: oneadmin
+- Password: The initial password stored in:
+sudo cat /var/lib/one/.one/one_auth
+
+
+The file contains your login credentials. Keep them private.
+
+Your first task
+Don't execute all the commands at once. Start with Step 2, Command 1, and continue through Step 3.
+My recommendation
+After running the installation command, send me a screenshot of your Ubuntu terminal. I'll check whether OpenNebula installed successfully before we proceed to starting services.
+
+Official guide: OpenNebula 7.4 Frontend Installation.
+
+If you want, I can:
+- Guide me through starting OpenNebula services step-by-step
+- Explain how to verify OpenNebula installation and interpret results
+- Show how to access and login to the OpenNebula dashboard securely
